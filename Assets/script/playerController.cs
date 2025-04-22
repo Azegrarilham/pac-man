@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.U2D;
 
-public class playerController : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     [SerializeField] InputAction MoveAction;
     Vector2 move;
@@ -64,7 +64,7 @@ public class playerController : MonoBehaviour
         flipSprit(movControl.lastMoveDirec);
         
     }
-    public void Stopanim()
+    public void StopAnimation()
     {
         anim.speed = 0;
     }

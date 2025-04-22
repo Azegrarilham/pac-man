@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static enemyController;
 
 public class enemyController : MonoBehaviour
 {
@@ -59,62 +60,48 @@ public class enemyController : MonoBehaviour
         ghostSprit = GetComponent<SpriteRenderer>();
         ghostEyesSprit = transform.Find("eyes").GetComponent<SpriteRenderer>();
         color = ghostSprit.color;
-        if (ghostType == GhostType.Blinky)
-        {
-            startGhostStat = GhostNodeStat.startNode;
-            respawnState = GhostNodeStat.centerNode;
-            GhoststartingNode = NodeStart;
-        }
-        else if(ghostType == GhostType.Pinky)
-        {
-            startGhostStat = GhostNodeStat.centerNode;
-            respawnState = GhostNodeStat.centerNode;
-            GhoststartingNode = NodeStart;  // For respawning
-           
-        }
-        else if(ghostType == GhostType.Inky)
-        {
-            startGhostStat = GhostNodeStat.leftNode;
-            respawnState = GhostNodeStat.leftNode;
-            GhoststartingNode = NodeLeft;
-        }
-        else if(ghostType == GhostType.Clyde)
-        {
-            startGhostStat = GhostNodeStat.rightNode;
-            respawnState = GhostNodeStat.rightNode;
-            GhoststartingNode = NodeRight;
-        }
-        
+        InitializeGhostType();
     }
     public void Setup()
     {
         nodeStat = startGhostStat;
         readyToLeaveHome = false;
         anim.SetBool("move", false);
-        //reset ghosts back to home
+
         movController.currentNode = GhoststartingNode;
         transform.position = GhoststartingNode.transform.position;
 
         movController.direction = "";
         movController.lastMoveDirec = "";
         isFrightened = false;
-
         leftHomBefor = false;
-        
-        if(ghostType == GhostType.Pinky )
+
+        if (ghostType == GhostType.Pinky)
         {
-            movController.currentNode = NodeCenter;  // Start at center
-            transform.position = NodeCenter.transform.position;  // Start at center
+            movController.currentNode = NodeCenter;
+            transform.position = NodeCenter.transform.position;
             readyToLeaveHome = true;
             leftHomBefor = true;
+            nodeStat = GhostNodeStat.centerNode;
         }
-        else if(ghostType == GhostType.Blinky)
+        else if (ghostType == GhostType.Blinky)
         {
             readyToLeaveHome = true;
             leftHomBefor = true;
+            nodeStat = GhostNodeStat.startNode;
         }
+        else if (ghostType == GhostType.Inky)
+        {
+            nodeStat = GhostNodeStat.leftNode;
+        }
+        else if (ghostType == GhostType.Clyde)
+        {
+            nodeStat = GhostNodeStat.rightNode;
+        }
+
         setVisibel(true);
     }
+
     private void Update()
     {
         if (nodeStat != GhostNodeStat.movingNode || !gameManager.isPowerPelletRuning) isFrightened = false;
@@ -428,16 +415,19 @@ public class enemyController : MonoBehaviour
         isVisibel = isItVisibel;
        
     }
+   
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.tag == "Player" && nodeStat != GhostNodeStat.respawning)
+        if (collision.tag == "Player" && nodeStat != GhostNodeStat.respawning)
         {
             //player eat ghost
             if (isFrightened)
             {
                 nodeStat = GhostNodeStat.respawning;
                 gameManager.GhostEaten();
-                
+
+                // Add this to make sure ghosts can leave home after respawning
+                StartCoroutine(PrepareToLeaveHome());
             }
             else //ghost eat player
             {
@@ -445,4 +435,62 @@ public class enemyController : MonoBehaviour
             }
         }
     }
+
+    
+    private IEnumerator PrepareToLeaveHome()
+    {
+        yield return new WaitForSeconds(2f);
+
+        // Reset position to proper starting node based on ghost type
+        if (ghostType == GhostType.Inky)
+        {
+            movController.currentNode = NodeLeft;
+            transform.position = NodeLeft.transform.position;
+            nodeStat = GhostNodeStat.leftNode;
+        }
+        else if (ghostType == GhostType.Clyde)
+        {
+            movController.currentNode = NodeRight;
+            transform.position = NodeRight.transform.position;
+            nodeStat = GhostNodeStat.rightNode;
+        }
+        else
+        {
+            movController.currentNode = NodeCenter;
+            transform.position = NodeCenter.transform.position;
+            nodeStat = GhostNodeStat.centerNode;
+        }
+
+        readyToLeaveHome = true;
+        leftHomBefor = false;
+    }
+
+
+    private void InitializeGhostType()
+    {
+        switch (ghostType)
+        {
+            case GhostType.Blinky:
+                startGhostStat = GhostNodeStat.startNode;
+                respawnState = GhostNodeStat.centerNode;
+                GhoststartingNode = NodeStart;
+                break;
+            case GhostType.Pinky:
+                startGhostStat = GhostNodeStat.centerNode;
+                respawnState = GhostNodeStat.centerNode;
+                GhoststartingNode = NodeStart;
+                break;
+            case GhostType.Inky:
+                startGhostStat = GhostNodeStat.leftNode;
+                respawnState = GhostNodeStat.leftNode;
+                GhoststartingNode = NodeLeft;
+                break;
+            case GhostType.Clyde:
+                startGhostStat = GhostNodeStat.rightNode;
+                respawnState = GhostNodeStat.rightNode;
+                GhoststartingNode = NodeRight;
+                break;
+        }
+    }
+
 }

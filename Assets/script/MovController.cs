@@ -96,6 +96,7 @@ public class MovController : MonoBehaviour
                (direction == "down" && lastMoveDirec == "up");
     }
 
+
     // Helper to check if at the center of the node
     private bool AtNodeCenter(NodeController node)
     {

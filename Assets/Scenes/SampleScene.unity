@@ -17474,6 +17474,9 @@ MonoBehaviour:
   ghostTimer: 0
   runningTimer: 0
   completedTimer: 0
+  isPowerPelletRuning: 0
+  curentPowerPelletTime: 0
+  powerPelletTimer: 8
 --- !u!4 &553171967
 Transform:
   m_ObjectHideFlags: 0
@@ -37136,14 +37139,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveAction:
     m_Name: Move
-    m_Type: 2
-    m_ExpectedControlType: 
-    m_Id: d0759c03-459d-450f-9e5f-2b73d7faf3f4
+    m_Type: 0
+    m_ExpectedControlType: Vector2
+    m_Id: a7cd406b-5c49-4b9b-abef-e4ed8ed47d55
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
-    - m_Name: WASD
-      m_Id: ac4c7c44-2bc8-40ac-9dbb-6d2e54281abf
+    - m_Name: 2D Vector
+      m_Id: 53e230ec-a91a-445b-a3f5-cd091493fbcf
       m_Path: 2DVector
       m_Interactions: 
       m_Processors: 
@@ -37151,47 +37154,7 @@ MonoBehaviour:
       m_Action: Move
       m_Flags: 4
     - m_Name: up
-      m_Id: 26c2541d-e502-414c-8f48-328bcdf231a5
-      m_Path: <Keyboard>/w
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Move
-      m_Flags: 8
-    - m_Name: down
-      m_Id: d88a57be-8d26-4d98-8458-219a9fd6cf9f
-      m_Path: <Keyboard>/s
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Move
-      m_Flags: 8
-    - m_Name: left
-      m_Id: e382167d-4832-435d-8ed0-8c6e5d750baa
-      m_Path: <Keyboard>/a
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Move
-      m_Flags: 8
-    - m_Name: right
-      m_Id: 04d44d18-649b-4e61-b2d3-3b03c7706709
-      m_Path: <Keyboard>/d
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Move
-      m_Flags: 8
-    - m_Name: Arrow Keys
-      m_Id: 15022f6b-6d50-47f2-a72d-e14ced6f07ff
-      m_Path: 2DVector
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Move
-      m_Flags: 4
-    - m_Name: up
-      m_Id: 72387742-f33c-4a44-9bd0-c651bfc949e3
+      m_Id: f6587138-a714-41c7-bb56-4a24d14cc348
       m_Path: <Keyboard>/upArrow
       m_Interactions: 
       m_Processors: 
@@ -37199,7 +37162,7 @@ MonoBehaviour:
       m_Action: Move
       m_Flags: 8
     - m_Name: down
-      m_Id: 04c878e4-8adf-4f7a-835d-e1dd084c0db8
+      m_Id: a40180fc-3203-478a-9b55-caaaaa0b061d
       m_Path: <Keyboard>/downArrow
       m_Interactions: 
       m_Processors: 
@@ -37207,7 +37170,7 @@ MonoBehaviour:
       m_Action: Move
       m_Flags: 8
     - m_Name: left
-      m_Id: 5290f86d-df5e-4c11-8aef-11a05be75ce8
+      m_Id: 103a4cfe-e261-4127-b36e-761d7970d27f
       m_Path: <Keyboard>/leftArrow
       m_Interactions: 
       m_Processors: 
@@ -37215,7 +37178,7 @@ MonoBehaviour:
       m_Action: Move
       m_Flags: 8
     - m_Name: right
-      m_Id: 8cd31ffc-57fa-4694-b06b-ca2d617a1722
+      m_Id: 555a7e8e-6ec4-4576-89d0-09b40f7d3c12
       m_Path: <Keyboard>/rightArrow
       m_Interactions: 
       m_Processors: 

@@ -91,16 +91,23 @@ public class NodeController : MonoBehaviour
     }
     private void Update()
     {
+        //if (!gameManager.GameRuning) return;
+
+        //if(isPowerPellet && hasPellet)
+        //{
+        //    powerPelletBlinkingtimer += Time.deltaTime;
+        //    if(powerPelletBlinkingtimer >= 0.1f)
+        //    {
+        //        powerPelletBlinkingtimer = 0;
+        //        pelletSprit.enabled = !pelletSprit.enabled;
+        //    }
+        //}
         if (!gameManager.GameRuning) return;
 
-        if(isPowerPellet && hasPellet)
+        if (isPowerPellet && hasPellet)
         {
-            powerPelletBlinkingtimer += Time.deltaTime;
-            if(powerPelletBlinkingtimer >= 0.1f)
-            {
-                powerPelletBlinkingtimer = 0;
-                pelletSprit.enabled = !pelletSprit.enabled;
-            }
+            float alpha = Mathf.PingPong(Time.time * 10, 1);
+            pelletSprit.color = new Color(1, 1, 1, alpha);
         }
     }
     public GameObject GetNodefromDirection(string direction)
