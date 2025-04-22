@@ -51,6 +51,11 @@ public class enemyController : MonoBehaviour
     SpriteRenderer ghostEyesSprit;
     Animator anim;
     public Color color;
+
+
+
+    private float lastDirectionChangeTime = 0f;
+    private const float minTimeBetweenDirectionChanges = 0.1f; // Adjust this value
     void Awake()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -128,7 +133,7 @@ public class enemyController : MonoBehaviour
         {
             anim.SetBool("frightened", true);
             ghostEyesSprit.enabled = false;
-            ghostSprit.color = new Color(225, 225, 225, 255);
+            ghostSprit.color = Color.white;
         }
         else
         {
@@ -151,39 +156,33 @@ public class enemyController : MonoBehaviour
     }
     public void ReachedCenterNode(NodeController node)
     {
-        if(nodeStat == GhostNodeStat.movingNode)
+        // Add a small delay between direction changes to prevent jittering
+        if (Time.time - lastDirectionChangeTime < minTimeBetweenDirectionChanges) return;
+
+        if (nodeStat == GhostNodeStat.movingNode)
         {
             leftHomBefor = true;
-            if(gameManager.currentGhostMode == GameManager.GhostMode.scatter)
+            string newDirection = "";
+
+            // Calculate new direction based on mode
+            if (gameManager.currentGhostMode == GameManager.GhostMode.scatter)
             {
-                //scatter mode
-                ScatterMode();
+                newDirection = GetScatterModeDirection();
             }
-            else if (isFrightened)//frighten mode
+            else if (isFrightened)
             {
-                string direction = getRandomDirection();
-                movController.setdirction(direction);
+                newDirection = getRandomDirection();
             }
             else
-            { //chase mode
+            {
+                newDirection = GetChaseModeDirection();
+            }
 
-                //Determine next game node to go to
-                if (ghostType == GhostType.Blinky)
-                {
-                    redGhostDirection();
-                }
-                else if(ghostType == GhostType.Pinky)
-                {
-                    pinkGhostDirection();
-                }
-                else if(ghostType == GhostType.Inky)
-                {
-                    blueGhostDirection();
-                }
-                else if(ghostType == GhostType.Clyde)
-                {
-                    orangeGhostDirection();
-                }
+            // Only change direction if it's different and valid
+            if (!string.IsNullOrEmpty(newDirection) && newDirection != movController.direction)
+            {
+                movController.setdirction(newDirection);
+                lastDirectionChangeTime = Time.time;
             }
         }
         else if(nodeStat == GhostNodeStat.respawning)
@@ -255,61 +254,81 @@ public class enemyController : MonoBehaviour
             }
         }
     }
-    void redGhostDirection()
+    private string GetChaseModeDirection()
     {
-        string dirction = ClosestDirection(gameManager.pacman.transform.position);
-        movController.setdirction(dirction);
+        // Return appropriate direction based on ghost type
+        switch (ghostType)
+        {
+            case GhostType.Blinky:
+                return ClosestDirection(gameManager.pacman.transform.position);
+            case GhostType.Pinky:
+                return GetPinkyTarget();
+            case GhostType.Inky:
+                return GetInkyTarget();
+            case GhostType.Clyde:
+                return GetClydeTarget();
+            default:
+                return "";
+        }
     }
-    void pinkGhostDirection()
+
+    private string GetScatterModeDirection()
+    {
+        // Return direction to scatter target (corner)
+        return ClosestDirection(ScaterNode.transform.position);
+    }
+
+    // Helper methods for specific ghost behaviors
+    private string GetPinkyTarget()
     {
         string pacmanDirection = gameManager.pacman.GetComponent<MovController>().lastMoveDirec;
-        float distenceBetweenNodes = 0.82f;
+        float distanceBetweenNodes = 0.82f;
 
         Vector2 target = gameManager.pacman.transform.position;
-        if (pacmanDirection == "left") target.x -= distenceBetweenNodes * 2;
-        else if (pacmanDirection == "right") target.x += distenceBetweenNodes * 2;
-        else if (pacmanDirection == "up") target.y += distenceBetweenNodes * 2;
-        else if (pacmanDirection == "down") target.y -= distenceBetweenNodes * 2;
+        if (pacmanDirection == "left") target.x -= distanceBetweenNodes * 2;
+        else if (pacmanDirection == "right") target.x += distanceBetweenNodes * 2;
+        else if (pacmanDirection == "up") target.y += distanceBetweenNodes * 2;
+        else if (pacmanDirection == "down") target.y -= distanceBetweenNodes * 2;
 
-        string direction = ClosestDirection(target);
-        movController.setdirction(direction);
+        return ClosestDirection(target);
     }
-    void blueGhostDirection()
+
+    private string GetInkyTarget()
     {
         string pacmanDirection = gameManager.pacman.GetComponent<MovController>().lastMoveDirec;
-        float distenceBetweenNodes = 0.82f;
+        float distanceBetweenNodes = 0.82f;
 
         Vector2 target = gameManager.pacman.transform.position;
-        if (pacmanDirection == "left") target.x -= distenceBetweenNodes * 2;
-        else if (pacmanDirection == "right") target.x += distenceBetweenNodes * 2;
-        else if (pacmanDirection == "up") target.y += distenceBetweenNodes * 2;
-        else if (pacmanDirection == "down") target.y -= distenceBetweenNodes * 2;
+        if (pacmanDirection == "left") target.x -= distanceBetweenNodes * 2;
+        else if (pacmanDirection == "right") target.x += distanceBetweenNodes * 2;
+        else if (pacmanDirection == "up") target.y += distanceBetweenNodes * 2;
+        else if (pacmanDirection == "down") target.y -= distanceBetweenNodes * 2;
 
         GameObject redGhost = gameManager.blinky;
-        float xDistense = target.x - redGhost.transform.position.x;
-        float yDistense = target.y - redGhost.transform.position.y;
+        float xDistance = target.x - redGhost.transform.position.x;
+        float yDistance = target.y - redGhost.transform.position.y;
 
-        Vector2 inkyTarget = new Vector2(target.x + xDistense, target.y + yDistense);
-        string direction = ClosestDirection(inkyTarget);
-        movController.setdirction(direction);
+        Vector2 inkyTarget = new Vector2(target.x + xDistance, target.y + yDistance);
+        return ClosestDirection(inkyTarget);
     }
-    void orangeGhostDirection()
+
+    private string GetClydeTarget()
     {
-        float distenceBetweenNodes = 0.82f;
+        float distanceBetweenNodes = 0.82f;
         float distance = Vector2.Distance(gameManager.pacman.transform.position, transform.position);
-        if (distance < 0) distance *= -1; //bax ta lakan salib nrj3oh mojab bax tshal 3lina l5dma
-        
-        //if we'r within 8 nodes from pacman chase using red chase mode
-        if(distance <= distenceBetweenNodes * 8)
+
+        // If Clyde is far from Pacman, chase directly
+        if (distance > distanceBetweenNodes * 8)
         {
-            redGhostDirection();
+            return ClosestDirection(ScaterNode.transform.position);
         }
+        // If Clyde is close to Pacman, scatter
         else
         {
-            //scater mode 
-            ScatterMode();
+            return ClosestDirection(gameManager.pacman.transform.position);
         }
     }
+
     string getRandomDirection()
     {
         List<string> posibelDirections = new List<string>();
@@ -336,11 +355,6 @@ public class enemyController : MonoBehaviour
         int directionIndex = Random.Range(0, posibelDirections.Count - 1);
         direction = posibelDirections[directionIndex];
         return direction;
-    }
-    void ScatterMode()
-    {
-        string dirction = ClosestDirection(ScaterNode.transform.position);
-        movController.setdirction(dirction);
     }
     string ClosestDirection(Vector2 target)
     {
@@ -412,10 +426,9 @@ public class enemyController : MonoBehaviour
     }
     public void setVisibel(bool isItVisibel)
     {
-        isVisibel = isItVisibel;
-       
+        this.isVisibel = isItVisibel; //  assign to the class field
     }
-   
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "Player" && nodeStat != GhostNodeStat.respawning)
@@ -435,37 +448,34 @@ public class enemyController : MonoBehaviour
             }
         }
     }
-
-    
     private IEnumerator PrepareToLeaveHome()
     {
         yield return new WaitForSeconds(2f);
-
+        if (!gameManager.GameRuning) yield break;
         // Reset position to proper starting node based on ghost type
-        if (ghostType == GhostType.Inky)
+        switch (ghostType)
         {
-            movController.currentNode = NodeLeft;
-            transform.position = NodeLeft.transform.position;
-            nodeStat = GhostNodeStat.leftNode;
-        }
-        else if (ghostType == GhostType.Clyde)
-        {
-            movController.currentNode = NodeRight;
-            transform.position = NodeRight.transform.position;
-            nodeStat = GhostNodeStat.rightNode;
-        }
-        else
-        {
-            movController.currentNode = NodeCenter;
-            transform.position = NodeCenter.transform.position;
-            nodeStat = GhostNodeStat.centerNode;
+            case GhostType.Inky:
+                movController.currentNode = NodeLeft;
+                transform.position = NodeLeft.transform.position;
+                nodeStat = GhostNodeStat.leftNode;
+                break;
+            case GhostType.Clyde:
+                movController.currentNode = NodeRight;
+                transform.position = NodeRight.transform.position;
+                nodeStat = GhostNodeStat.rightNode;
+                break;
+            default:
+                movController.currentNode = NodeCenter;
+                transform.position = NodeCenter.transform.position;
+                nodeStat = GhostNodeStat.centerNode;
+                break;
         }
 
         readyToLeaveHome = true;
         leftHomBefor = false;
+
     }
-
-
     private void InitializeGhostType()
     {
         switch (ghostType)

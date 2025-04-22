@@ -13,6 +13,7 @@ public class MovController : MonoBehaviour
     public GameManager gameManager;
     public bool canWrap = true;
     public bool isGhost = false;
+
     void Start()
     {
         if (gameObject.CompareTag("Ghost")) isGhost = true;
@@ -21,11 +22,7 @@ public class MovController : MonoBehaviour
     
     void Update()
     {
-        if (!gameManager.GameRuning)
-        {
-            return;
-        }
-
+        if (!gameManager.GameRuning) return;
        
         NodeController currentNdC = currentNode.GetComponent<NodeController>();
         transform.position = Vector2.MoveTowards(transform.position, currentNdC.transform.position, speed * Time.deltaTime);
