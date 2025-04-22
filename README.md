@@ -2,6 +2,7 @@
 
 A Unity-based recreation of the classic Pac-Man arcade game, featuring authentic ghost behavior and classic gameplay mechanics.
 
+
 ## 🎮 Game Features
 
 - Classic Pac-Man gameplay mechanics
@@ -79,6 +80,9 @@ A Unity-based recreation of the classic Pac-Man arcade game, featuring authentic
 3. Power pellets enable ghost hunting
 4. Complete level when all pellets are collected
 5. Increase difficulty and repeat
+
+## 📚 Resources
+🔗 [The Pac-Man Dossier](https://www.gamedeveloper.com/design/the-pac-man-dossier) — Deep breakdown of the original game's logic and AI.
 
 ## 💡 Future Improvements
 
