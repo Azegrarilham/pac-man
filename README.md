@@ -1,7 +1,7 @@
 # Pac-Man Clone
 
 A Unity-based recreation of the classic Pac-Man arcade game, featuring authentic ghost behavior and classic gameplay mechanics.
-
+![test](Assets/preview.png)
 
 ## 🎮 Game Features
 
